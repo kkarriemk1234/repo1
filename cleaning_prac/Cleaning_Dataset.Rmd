@@ -1,0 +1,53 @@
+---
+title: "Cleaning_Prac"
+author: "Khalilah"
+date: "2024-06-13"
+output: html_document
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(echo=TRUE)
+```
+
+
+```{r include=TRUE, warning = FALSE, message= FALSE}
+library(tidyverse)
+library(lubridate)
+library(dplyr)
+library(readr)
+```
+
+
+```{r include=TRUE}
+dives <- read_csv('https://raw.githubusercontent.com/databrew/intro-to-data-science/main/data/whales-dives.csv')
+
+head(dives)
+messy_dives <- read_csv('https://raw.githubusercontent.com/databrew/intro-to-data-science/main/data/whales-dives-messy.csv')
+
+head(messy_dives)
+
+my_dives <- messy_dives
+
+my_dives<-my_dives%>%
+  mutate(species = Species.ID,
+  sit = parse_number(sit),
+  YEAR = ifelse(YEAR < 2000, paste0(20, YEAR), YEAR),
+  Month = str_pad(Month,2,pad="0"),
+  Day = str_pad(Day,2,pad="0"),
+  Species.ID = paste0(YEAR,Month,Day,sit),
+  bhvr = ifelse(bhvr == 'OTHER'| bhvr == 'FEED', bhvr, 'NA'),
+  species = ifelse(species == "FW" | species == "HW",species, 'NA'))
+
+# Delete the following columns from my_dives: YEAR, Month, Day, sit
+my_dives <- select(my_dives, -YEAR)
+my_dives <- select(my_dives, -Month)
+my_dives <- select(my_dives, -Day)
+my_dives <- select(my_dives, -sit)
+# Remove NAs
+my_dives <- my_dives %>%
+  drop_na() %>% 
+  filter(species != 'NA')
+
+
+
+```
